@@ -2094,6 +2094,7 @@ static int ftdi_gpio_init(struct usb_serial_port *port)
 {
 	struct ftdi_private *priv = usb_get_serial_port_data(port);
 	struct usb_serial *serial = port->serial;
+	struct usb_device *udev = serial->dev;
 	int result;
 
 	switch (priv->chip_type) {
@@ -2115,7 +2116,11 @@ static int ftdi_gpio_init(struct usb_serial_port *port)
 
 	mutex_init(&priv->gpio_lock);
 
-	priv->gc.label = "ftdi-cbus";
+	priv->gc.label = devm_kasprintf(&udev->dev, GFP_KERNEL, "ftdi-cbus-%s", udev->serial);
+	if (!priv->gc.label) {
+		return -ENOMEM;
+	}
+
 	priv->gc.request = ftdi_gpio_request;
 	priv->gc.get_direction = ftdi_gpio_direction_get;
 	priv->gc.direction_input = ftdi_gpio_direction_input;
