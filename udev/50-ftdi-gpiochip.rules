@@ -1,0 +1,3 @@
+# SUBSYSTEM=="gpio", KERNEL=="gpio*", ACTION=="add", RUN+="/bin/chown root:plugdev /dev/$name", RUN+="/bin/chmod 660 /dev/$name"
+# SUBSYSTEM=="gpio", KERNEL=="gpiochip*", GROUP:="gpiod", MODE:="0660"
+SUBSYSTEM=="gpio", KERNEL=="gpiochip*", GROUP:="plugdev", MODE:="0660"
