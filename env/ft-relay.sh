@@ -110,6 +110,24 @@ function ftpwr() {
     fi
 }
 
+function ftpwrwait() {
+	state=$(ftpwrset $1)
+	loop=0
+	while true; do
+		sleep 0.5
+		((loop++))
+		printf "%d - Wait Power %d - " $loop $state
+		input=$(ftinput)
+		if [ ${state} -eq ${input} ]; then
+			break;
+		fi
+		if [ ${loop} -eq 60 ]; then
+			ftlog "Power state did not reach $state"
+			break;
+		fi
+	done
+}
+
 function ftig() {
     state=$(ft_arg $1)
     [ -z "${state}" ] && return
@@ -128,19 +146,20 @@ function ftboot() {
 
 
 function ftoff() {
-    ftpwrset 0
-    ftig 0
-    ftboot 0
+    ftig 0 > /dev/null
+    ftboot 0 > /dev/null
+    ftpwrwait 0
 }
 
 function fton() {
-    ftig 1
-    ftboot 0
-    ftpwr 1
+    ftig 1 > /dev/null
+    ftboot 0 > /dev/null
+    ftpwr 1 > /dev/null
 }
 
 function ftusb() {
-    ftig 1
-    ftboot 1
-    ftpwr 1
+    ftboot 1 > /dev/null
+	sleep 0.1
+	ftig 1 > /dev/null
+    ftpwr 1 > /dev/null
 }
