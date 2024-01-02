@@ -16,7 +16,9 @@ fi
 
 RELAY_NAME=
 PIN_PWR=
+PIN_PWR2=-1
 PIN_INP=
+PIN_INP2=-1
 PIN_BOOT=
 PIN_IGN=
 
@@ -38,6 +40,7 @@ function ft_config() {
 						PIN_BOOT=3
 						PIN_IGN=2
 						PIN_INP_INV=1
+						PIN_PWR_INV=0
 						;;
 					2)
 						echo "Using Config 2"
@@ -47,6 +50,21 @@ function ft_config() {
 						PIN_BOOT=0
 						PIN_IGN=3
 						PIN_INP_INV=0
+						PIN_PWR_INV=0
+						;;
+					3)
+						echo "Using Config 3"
+						RELAY_NAME=ftdi-cbus-FT-EPC-20-12-23
+						PIN_PWR=0
+						PIN_INP=2
+						PIN_BOOT=-1
+						PIN_IGN=-1
+						PIN_INP_INV=1
+						PIN_PWR_INV=1
+						PIN_PWR2=1
+						PIN_INP2=3
+						PIN_INP2_INV=1
+						PIN_PWR2_INV=1
 						;;
 				esac
 			;;
@@ -58,6 +76,9 @@ function ft_config() {
 	echo "- Input   : ${PIN_INP}"
 	echo "- Boot    : ${PIN_BOOT}"
 	echo "- Ignition: ${PIN_IGN}"
+
+	echo "- Power 2  : ${PIN_PWR2}"
+	echo "- Input 2  : ${PIN_INP2}"
 }
 
 ft_config $*
@@ -83,10 +104,12 @@ function ft_arg(){
 }
 
 function ftpwrset() {
+	local PARAM=
     state=$(ft_arg $1)
     [ -z "${state}" ] && return
     ftlog "Power set ${state}"
-    gpioset ${RELAY_NAME} ${PIN_PWR}=${state}
+	[ ${PIN_PWR_INV} -eq 1 ] && PARAM=-l
+    gpioset ${PARAM} ${RELAY_NAME} ${PIN_PWR}=${state}
     echo ${state}
 }
 
@@ -107,6 +130,7 @@ function ftpwr() {
         ftlog "Power: OK"
     else
         ftlog "Power: Error"
+		return 1
     fi
 }
 
@@ -128,7 +152,65 @@ function ftpwrwait() {
 	done
 }
 
+# POWER 2 / INPUT 2
+
+function ftpwr2set() {
+	local PARAM=
+    state=$(ft_arg $1)
+    [ -z "${state}" ] && return
+    ftlog "Power2 set ${state}"
+	[ ${PIN_PWR2_INV} -eq 1 ] && PARAM=-l
+    gpioset ${PARAM} ${RELAY_NAME} ${PIN_PWR2}=${state}
+    echo ${state}
+}
+
+function ftinput2()
+{
+	local PARAM=
+	[ ${PIN_INP2_INV} -eq 1 ] && PARAM=-l
+    input=$(gpioget ${PARAM} ${RELAY_NAME} ${PIN_INP2})
+    ftlog "Input2 reads: $input"
+    echo $input
+}
+
+function ftpwr2() {
+    state=$(ftpwrset2 $1)
+    sleep 0.2
+    input=$(ftinput2)
+    if [ ${state} -eq ${input} ]; then
+        ftlog "Power2: OK"
+    else
+        ftlog "Power2: Error"
+		return 1
+    fi
+}
+
+function ftpwr2wait() {
+	state=$(ftpwr2set $1)
+	loop=0
+	while true; do
+		sleep 0.5
+		((loop++))
+		printf "%d - Wait Power2 %d - " $loop $state
+		input=$(ftinput2)
+		if [ ${state} -eq ${input} ]; then
+			break;
+		fi
+		if [ ${loop} -eq 60 ]; then
+			ftlog "Power2 state did not reach $state"
+			break;
+		fi
+	done
+}
+
+# Ignition
+
 function ftig() {
+	if [ ${PIN_IGN} -eq -1 ]; then
+		ftlog Skipping Ignition
+		return
+	fi
+
     state=$(ft_arg $1)
     [ -z "${state}" ] && return
     ftlog "Ignition set ${state}"
@@ -137,6 +219,11 @@ function ftig() {
 }
 
 function ftboot() {
+	if [ ${PIN_BOOT} -eq -1 ]; then
+		ftlog Skipping Boot
+		return
+	fi
+
     state=$(ft_arg $1)
     [ -z "${state}" ] && return
     ftlog "Boot set ${state}"
