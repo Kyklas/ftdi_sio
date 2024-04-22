@@ -14,11 +14,16 @@ if [ ${SOURCED} -eq 0 ]; then
 	exit 1
 fi
 
-GPIOCHIP_NAME=
-PIN_PWR=
-PIN_INP=
-PIN_BOOT=
-PIN_IGN=
+# Keep any existing value
+GPIOCHIP_NAME=${GPIOCHIP_NAME:-}
+PIN_PWR=${PIN_PWR:-}
+PIN_INP=${PIN_INP:-}
+PIN_BOOT=${PIN_BOOT:-}
+PIN_IGN=${PIN_IGN:-}
+
+function ftlog(){
+    echo "FT Relay: $@" >&2
+}
 
 function ft_find_gpiochip() {
 
@@ -49,8 +54,11 @@ function ft_find_gpiochip() {
             ftlog "${FTDI_INFO}"
         fi
     done
-
-    echo "${FTDI_GPIOCHIP[${SERIAL}]}"
+    if [ ! -z "${SERIAL}" ]; then
+       echo "${FTDI_GPIOCHIP[${SERIAL}]}"
+    else
+       echo -n ""
+    fi
 } 
 
 function ft_config() {
@@ -64,6 +72,7 @@ function ft_config() {
             l)
                 # listing ftdi
                 ft_find_gpiochip
+                return
                 ;;
 			c)
 				case "${OPTARG}" in
@@ -105,10 +114,6 @@ function ft_config() {
 }
 
 ft_config $*
-
-function ftlog(){
-    echo "FT Relay: $@" >&2
-}
 
 function ft_arg(){
     case $1 in
