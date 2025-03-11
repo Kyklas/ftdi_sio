@@ -6,19 +6,19 @@
       "chipFamily": "ESP32-C3",
       "parts": [
         {
-          "path": "/fw/wled/bootloader.bin",
+          "path": "../fw/wled/bootloader.bin",
           "offset": 0
         },
         {
-          "path": "/fw/wled/partitions.bin",
+          "path": "../fw/wled/partitions.bin",
           "offset": 32768
         },
         {
-          "path": "/fw/wled/bordielight.bin",
+          "path": "../fw/wled/bordielight.bin",
           "offset": 65536
         },
         {
-          "path": "/fw/wled/bordielight-spiffs.bin",
+          "path": "../fw/wled/bordielight-spiffs.bin",
           "offset": 3211264
         }
       ]
