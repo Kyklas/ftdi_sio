@@ -1,0 +1,27 @@
+{
+  "name": "PineTree Light ESP32C3",
+  "version": "SHS 202302412",
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        {
+          "path": "/.pio/build/esp32c3_PineTreeLight/bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "/.pio/build/esp32c3_PineTreeLight/partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "/.pio/build/esp32c3_PineTreeLight/firmware.bin",
+          "offset": 65536
+        },
+        {
+          "path": "/.pio/build/esp32c3_PineTreeLight/wled-spiffs.bin",
+          "offset": 3211264
+        }
+      ]
+    }
+  ]
+}

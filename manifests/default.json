@@ -1,0 +1,23 @@
+{
+  "name": "Default Light ESP32C3",
+  "version": "SHS 202302412",
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        {
+          "path": "/fw/wled/bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "/fw/wled/partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "/fw/wled/firmware.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}
