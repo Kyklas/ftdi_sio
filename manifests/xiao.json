@@ -1,0 +1,27 @@
+{
+  "name": "XIAO Light ESP32C3",
+  "version": "Mountain Light Build 3/10/2025",
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        {
+          "path": "../fw/xiao/bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "../fw/xiao/partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "../fw/xiao/boot_app0.bin",
+          "offset": 57344
+        },
+        {
+          "path": "../fw/xiao/xiaolight.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}
